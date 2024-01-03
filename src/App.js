@@ -23,32 +23,53 @@ function App() {
   const [optimizelyReady, setOptimizelyReady] = useState(false);
 
   const optimizely = require("@optimizely/optimizely-sdk");
+  const { createInstance, enums } = require("@optimizely/optimizely-sdk");
   const optimizelyClient = optimizely.createInstance({
     sdkKey: "B3sNMM9RTdM6X7b6kMW4r",
-    logLevel: "debug",
+    logLevel: "info",
     datafileOptions: {
       updateInterval: 1,
     },
   });
 
-  optimizelyClient.onReady().then(async () => {
-    // const attributes = { hasPurchased: true };
+  ///////////////////////////////////////////
+  // SET UP DECISION NOTIFICATION LISTENER //
+  ///////////////////////////////////////////
+  const onDecision = ({ type, userId, attributes, decisionInfo }) => {
+    // Add a DECISION Notification Listener for type FLAG
+    if (type === "flag") {
+      // Access information about feature, for example, key and enabled status
+      console.log("decision notification listener fired");
+      console.log("decisionInfo:", decisionInfo);
+      console.log(decisionInfo["flagKey"]);
+      console.log(decisionInfo["enabled"]);
+      console.log(decisionInfo["decisionEventDispatched"]);
+      // Send data to analytics provider here
+    }
+  };
 
-    const user = optimizelyClient.createUserContext(
-      "vuid_eb018ffef7354004bc3a5bf207a"
+  const notificationId =
+    optimizelyClient.notificationCenter.addNotificationListener(
+      enums.NOTIFICATION_TYPES.DECISION,
+      onDecision
     );
+
+  optimizelyClient.onReady().then(async () => {
+    const attributes = { hasPurchased: true, mobileDevice: true };
+
+    const user = optimizelyClient.createUserContext("user123", attributes);
 
     /* -------------------------------------------------------------------------- */
     /*                                 ODP Methods                                */
     /* -------------------------------------------------------------------------- */
 
     /* ------------------------ Fetch Qualified Segments ------------------------ */
-    const odpSegments = await user
-      .fetchQualifiedSegments
-      // "OptimizelySegmentOption.IGNORE_CACHE",
-      // "OptimizelySegmentOption.RESET_CACHE"
-      ();
-    console.log("Qualified segments", user.qualifiedSegments);
+    // const odpSegments = await user
+    //   .fetchQualifiedSegments
+    //   // "OptimizelySegmentOption.IGNORE_CACHE",
+    //   // "OptimizelySegmentOption.RESET_CACHE"
+    //   ();
+    // console.log("Qualified segments", user.qualifiedSegments);
 
     const decision = user.decide("product_detail_page");
     console.log("Opti variables:", decision.variables);
@@ -83,7 +104,7 @@ function App() {
 
   /* ----------------------------- Send ODP Event ----------------------------- */
   const handleCartClick = () => {
-    optimizelyClient.sendOdpEvent("has_purchased");
+    // optimizelyClient.sendOdpEvent("has_purchased");
 
     console.log("cart button clicked");
     const updatedAddedToCart = !addedToCart;
