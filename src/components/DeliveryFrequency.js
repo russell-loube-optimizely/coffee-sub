@@ -1,6 +1,6 @@
 import Form from "react-bootstrap/Form";
 
-const DeliveryFrequency = ({ frequencies }) => {
+const DeliveryFrequency = ({ frequencies, defaultFrequency }) => {
   return (
     <Form>
       {frequencies.map((frequency) => (
@@ -10,6 +10,7 @@ const DeliveryFrequency = ({ frequencies }) => {
           type="radio"
           id={frequency.value}
           key={frequency.value}
+          defaultChecked={frequency.value === defaultFrequency}
         />
       ))}
     </Form>

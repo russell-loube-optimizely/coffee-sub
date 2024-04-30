@@ -1,3 +1,5 @@
-# Advanced Audience Targeting Demo
+# Feature Experimentation Demo
 
-The purpose of this React app is to demo Advanced Audience Targeting (AAT).
+The purpose of this React app is to demo Feature Experimentation.
+
+## Prerequisites
